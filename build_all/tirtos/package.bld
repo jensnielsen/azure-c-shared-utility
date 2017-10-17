@@ -60,8 +60,7 @@ for (x = 0; x < xdcargs.length; x++) {
         slIncs = (xdcargs[x] + "").replace(/'/g, '');
         slIncs = slIncs.substring(slIncs.indexOf('=') + 1);
         if (slIncs != "") {
-            slIncs += "/simplelink";
-            slIncs = "-I" + slIncs + " -I" + slIncs + "/include ";
+            slIncs = "-D__SL__ -I" + slIncs + "/netapps -I" + slIncs + "/simplelink -I" + slIncs + "/simplelink/include ";
         }
     }
 

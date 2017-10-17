@@ -5,13 +5,22 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <ti/net/http/httpcli.h>
+#include <http/client/httpcli.h>
 
 #include "azure_c_shared_utility/httpapi.h"
 #include "azure_c_shared_utility/strings.h"
 #include "azure_c_shared_utility/xlogging.h"
 
 #define CONTENT_BUF_LEN     128
+
+const char *HTTPStd_GET     = "GET";
+const char *HTTPStd_POST    = "POST";
+const char *HTTPStd_HEAD    = "HEAD";
+const char *HTTPStd_OPTIONS = "OPTIONS";
+const char *HTTPStd_PUT     = "PUT";
+const char *HTTPStd_DELETE  = "DELETE";
+const char *HTTPStd_CONNECT = "CONNECT";
+const char *HTTPStd_PATCH   = "PATCH";
 
 static const char* getHttpMethod(HTTPAPI_REQUEST_TYPE requestType)
 {
@@ -67,7 +76,7 @@ HTTP_HANDLE HTTPAPI_CreateConnection(const char* hostName)
 		LogError("HTTPCli_initSockAddr failed, ret=%d", ret);
         return (NULL);
     }
-    ((struct sockaddr_in *) (&addr))->sin_port = htons(HTTPStd_SECURE_PORT);
+    ((struct sockaddr_in *) (&addr))->sin_port = htons(HTTPS_PORT);
 
     cli = HTTPCli_create();
     if (cli == NULL) {
@@ -78,7 +87,7 @@ HTTP_HANDLE HTTPAPI_CreateConnection(const char* hostName)
     ret = HTTPCli_connect(cli, &addr, HTTPCli_TYPE_TLS, NULL);
     if (ret < 0) {
 		LogError("HTTPCli_connect failed, ret=%d", ret);
-        HTTPCli_delete(&cli);
+        HTTPCli_delete(cli);
         return (NULL);
     }
      
@@ -91,7 +100,7 @@ void HTTPAPI_CloseConnection(HTTP_HANDLE handle)
 
     if (cli) {
         HTTPCli_disconnect(cli);
-        HTTPCli_delete(&cli);
+        HTTPCli_delete(cli);
     }
 }
 
@@ -144,6 +153,7 @@ HTTPAPI_RESULT HTTPAPI_ExecuteRequest(HTTP_HANDLE handle,
         ret = splitHeader(hname, &hvalue);
 
         if (ret == 0) {
+            //note, this call fails on pure 1.3.0 because SEND_BUFLEN was reduced, it needs to be changed back to 256 in SDK
             ret = HTTPCli_sendField(cli, hname, hvalue, false);
         }
 
@@ -185,6 +195,7 @@ HTTPAPI_RESULT HTTPAPI_ExecuteRequest(HTTP_HANDLE handle,
     cnt = 0;
     offset = 0;
     do {
+        /* note, this function was removed from SDK and had to be added again... */
         ret = HTTPCli_readResponseHeader(cli, contentBuf, CONTENT_BUF_LEN,
             &moreFlag);
         if (ret < 0) {
