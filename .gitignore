@@ -10,3 +10,11 @@
 *.jar
 *.aps
 /res
+/build_all/tirtos/.dlls
+/build_all/tirtos/.executables
+/build_all/tirtos/.interfaces
+/build_all/tirtos/.libraries
+/build_all/tirtos/.xdcenv.mak
+/build_all/tirtos/lib/
+/build_all/tirtos/package.mak
+/build_all/tirtos/package/

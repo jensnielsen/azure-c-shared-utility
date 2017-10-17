@@ -28,7 +28,7 @@ var SRCS = [
     "httpheaders.c",
     "lock_pthreads.c",
     "map.c",
-    "platform_stub.c",
+    "platform_tirtos.c",
     "sastoken.c",
     "sha1.c",
     "sha224.c",
